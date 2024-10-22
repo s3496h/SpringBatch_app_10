@@ -1,0 +1,22 @@
+
+spring:
+  datasource:
+    url: jdbc:mariadb://${prodDbIp}:3306/SpringBatch_app_10__prod?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+    username: ${prodDbId}
+    password: ${prodDbPw}
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+        use_sql_comments: false
+    hibernate:
+      ddl-auto: none
+logging:
+  level:
+    root: info
+    com.koreait.exam.final__acc_app_2024_04.app: info
+    org.hibernate.type.descriptor.sql: info
+custom:
+  site:
+    baseUrl: "https://domain"
