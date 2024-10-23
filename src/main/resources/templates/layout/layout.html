@@ -29,8 +29,8 @@
 <header class="fixed z-40 top-0 left-0 w-full bg-white border-b-[1px] border-b-[color:#efefef] h-[35px]">
     <div class="container mx-auto h-full flex items-center px-2">
         <a href="/" class="logo flex font-bold mr-auto">
-            <span class="text-[#1E9EFE]">M</span>
-            <span class="ml-[2px] hidden sm:block">UT</span>
+            <span class="text-[#1E9EFE]">T</span>
+            <span class="ml-[2px] hidden sm:block">MS</span>
         </a>
         <div class="flex gap-4">
             <a href="/member/login" class="inline-flex" sec:authorize="isAnonymous()">
@@ -58,6 +58,12 @@
                     프로파일
                 </span>
             </a>
+            <a href="/song/create" class="inline-flex" sec:authorize="isAuthenticated()">
+                <i class="fa-solid fa-upload"></i>
+                <span class="ml-[2px] hidden sm:block">
+                    음원 업로드
+                </span>
+            </a>
         </div>
     </div>
 </header>
@@ -78,7 +84,7 @@
             <a href="/">청소년보호정책</a>
         </div>
         <div>
-            <a href="/">©MUT Corp.</a>
+            <a href="/">©TMS  Corp.</a>
         </div>
     </div>
 </footer>
