@@ -1,4 +1,3 @@
-
 spring:
   datasource:
     url: jdbc:mariadb://${prodDbIp}:3306/SpringBatch_app_10__prod?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
