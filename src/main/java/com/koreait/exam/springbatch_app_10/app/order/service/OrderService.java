@@ -11,6 +11,7 @@ import com.koreait.exam.springbatch_app_10.app.product.entity.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class OrderService {
     private final MemberService memberService;
     private final CartService cartService;
     private final OrderRepository orderRepository;
+
     @Transactional
     public Order createFromCart(Member buyer) {
         // 입력된 회원의 장바구니 아이템들을 전부 가져온다.
@@ -38,6 +40,7 @@ public class OrderService {
         }
         return create(buyer, orderItems);
     }
+
     @Transactional
     public Order create(Member buyer, List<OrderItem> orderItems) {
         Order order = Order
@@ -47,9 +50,12 @@ public class OrderService {
         for (OrderItem orderItem : orderItems) {
             order.addOrderItem(orderItem);
         }
+        order.makeName();
+
         orderRepository.save(order);
         return order;
     }
+
     @Transactional
     public void payByRestCashOnly(Order order) {
         Member buyer = order.getBuyer();
@@ -62,6 +68,7 @@ public class OrderService {
         order.setPaymentDone();
         orderRepository.save(order);
     }
+
     @Transactional
     public void refund(Order order) {
         int payPrice = order.getPayPrice();
@@ -69,10 +76,22 @@ public class OrderService {
         order.setRefundDone();
         orderRepository.save(order);
     }
+
     public Optional<Order> findForPrintById(Long id) {
         return orderRepository.findById(id);
     }
+
     public boolean actorCanSee(Member actor, Order order) {
         return actor.getId().equals(order.getBuyer().getId());
+    }
+
+    @Transactional//////// 얘 때문이었음......
+    public void payByTossPayments(Order order) {
+        Member buyer = order.getBuyer();
+        int payPrice = order.calculatePayPrice();
+        memberService.addCash(buyer, payPrice * 1, "주문결제충전__토스페이먼츠 결제");
+        memberService.addCash(buyer, payPrice * -1, "주문결제__토스페이먼츠 결제");
+        order.setPaymentDone();
+        orderRepository.save(order);
     }
 }
