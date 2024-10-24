@@ -4,6 +4,29 @@
     <title>주문 상세보기</title>
 </head>
 <main layout:fragment="main">
+    <script src="https://js.tosspayments.com/v1"></script>
+    <script th:inline="javascript">
+        const orderId = /*[[${order.id}]]*/ null;
+        const buyerName = /*[[${order.buyer.name}]]*/ null;
+        const orderName = /*[[${order.name}]]*/ null;
+        const orderPayPrice = /*[[${order.calculatePayPrice}]]*/ null;
+    </script>
+    <script>
+        const tossPayments = TossPayments("payments 개발자센터, 내 개발 정보 , API 개별 연동 키, 클라이언트 키");
+        function payment() {
+            const method = "카드"; // 카드 or 가상계좌
+            const paymentData = {
+                amount: orderPayPrice,
+                orderId: "order__" + orderId,
+                orderName,
+                customerName: buyerName,
+                successUrl: window.location.origin + "/success",
+                failUrl: window.location.origin + "/fail",
+            };
+            tossPayments.requestPayment(method, paymentData);
+        }
+    </script>
+
     <section class="section flex-grow flex flex-col items-center justify-center">
         <div class="max-w-md w-full px-2 pt-4">
             <h2 class="font-bold text-lg">주문 상세내용</h2>
@@ -18,7 +41,11 @@
                 아티스트 : [[${orderItem.product.author.username}]]
                 가격 : [[${orderItem.salePrice}]]
             </div>
+            <div>
+                <button onclick="payment()" class="btn btn-sm btn-primary">결제하기</button>
+            </div>
         </div>
+
     </section>
 </main>
 </html>
