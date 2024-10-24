@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koreait.exam.springbatch_app_10.app.member.entity.Member;
 import com.koreait.exam.springbatch_app_10.app.order.entity.Order;
 import com.koreait.exam.springbatch_app_10.app.order.exception.ActorCanNotSeeOrderException;
+import com.koreait.exam.springbatch_app_10.app.order.exception.OrderIdNotMatchedException;
 import com.koreait.exam.springbatch_app_10.app.order.service.OrderService;
 import com.koreait.exam.springbatch_app_10.app.security.dto.MemberContext;
 import com.koreait.exam.springbatch_app_10.app.song.exception.ActorCanNotSeeException;
@@ -64,15 +65,23 @@ public class OrderController {
     }
     @RequestMapping("/{id}/success")
     public String confirmPayment(
-            @RequestParam String paymentKey, @RequestParam String orderId, @RequestParam Long amount,
+            @PathVariable long id,
+            @RequestParam String paymentKey,
+            @RequestParam String orderId,
+            @RequestParam Long amount,
             Model model) throws Exception {
+        Order order = orderService.findForPrintById(id).get();
+        long orderIdInputed = Integer.parseInt(orderId.split("__")[1]);
+        if (id != orderIdInputed) {
+            throw new OrderIdNotMatchedException();
+        }
         HttpHeaders headers = new HttpHeaders();
         // headers.setBasicAuth(SECRET_KEY, ""); // spring framework 5.2 이상 버전에서 지원
         headers.set("Authorization", "Basic " + Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes()));
         headers.setContentType(MediaType.APPLICATION_JSON);
         Map<String, String> payloadMap = new HashMap<>();
         payloadMap.put("orderId", orderId);
-        payloadMap.put("amount", String.valueOf(amount));
+        payloadMap.put("amount", String.valueOf(order.calculatePayPrice()));
         HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(payloadMap), headers);
         ResponseEntity<JsonNode> responseEntity = restTemplate.postForEntity(
                 "https://api.tosspayments.com/v1/payments/" + paymentKey, request, JsonNode.class);
